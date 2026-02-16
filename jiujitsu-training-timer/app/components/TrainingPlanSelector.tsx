@@ -18,6 +18,7 @@ export default function TrainingPlanSelector({
   const [mode, setMode] = useState<'preset' | 'custom'>('preset');
   const [numRounds, setNumRounds] = useState(5);
   const [roundDuration, setRoundDuration] = useState(300); // 5 min
+  const [restDuration, setRestDuration] = useState(60); // 1 min
   const [selectedPositions, setSelectedPositions] = useState<(Position | null)[]>([]);
   const [showPositionSelector, setShowPositionSelector] = useState(false);
   const [currentRoundForPosition, setCurrentRoundForPosition] = useState(0);
@@ -52,24 +53,22 @@ export default function TrainingPlanSelector({
 
   const initializeCustomPositions = () => {
     if (selectedPositions.length !== numRounds) {
-      setSelectedPositions(getRandomPositions(numRounds));
+      setSelectedPositions(Array(numRounds).fill(null));
     }
   };
 
   // Create custom plan
   const createCustomPlan = () => {
-    initializeCustomPositions();
-
     const customRounds: RoundConfig[] = Array.from({ length: numRounds }, (_, i) => ({
       duration: roundDuration,
-      position: selectedPositions[i] || getRandomPositions(numRounds)[i],
+      position: selectedPositions[i] || null,
     }));
 
     const customPlan: TrainingPlan = {
       id: 'custom',
       name: `Custom (${numRounds}x${Math.floor(roundDuration / 60)}m)`,
       rounds: customRounds,
-      restDuration: 60,
+      restDuration: restDuration,
     };
 
     onSelect(customPlan);
@@ -150,8 +149,10 @@ export default function TrainingPlanSelector({
                     if (selectedPositions.length < newNum) {
                       setSelectedPositions([
                         ...selectedPositions,
-                        ...getRandomPositions(newNum - selectedPositions.length),
+                        ...Array(newNum - selectedPositions.length).fill(null),
                       ]);
+                    } else if (selectedPositions.length > newNum) {
+                      setSelectedPositions(selectedPositions.slice(0, newNum));
                     }
                   }}
                   className="w-full"
@@ -170,6 +171,28 @@ export default function TrainingPlanSelector({
                       onClick={() => setRoundDuration(dur)}
                       className={`px-3 py-1 text-sm rounded ${
                         roundDuration === dur
+                          ? 'bg-indigo-800 text-white'
+                          : 'bg-gray-700 text-gray-200'
+                      }`}
+                    >
+                      {Math.floor(dur / 60)}m
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rest Duration */}
+              <div>
+                <label className="block text-white font-semibold mb-2">
+                  Rest Between Rounds: {Math.floor(restDuration / 60)} minute(s)
+                </label>
+                <div className="flex gap-2">
+                  {[60, 180, 300, 600].map((dur) => (
+                    <Button
+                      key={dur}
+                      onClick={() => setRestDuration(dur)}
+                      className={`px-3 py-1 text-sm rounded ${
+                        restDuration === dur
                           ? 'bg-indigo-800 text-white'
                           : 'bg-gray-700 text-gray-200'
                       }`}
@@ -213,7 +236,10 @@ export default function TrainingPlanSelector({
                           <div className="text-xs">{selectedPositions[i].name.split('(')[0].trim()}</div>
                         </div>
                       ) : (
-                        <div>R{i + 1}</div>
+                        <div>
+                          <div>R{i + 1}</div>
+                          <div className="text-xs text-gray-400">Click to select</div>
+                        </div>
                       )}
                     </button>
                   ))}

@@ -95,26 +95,33 @@ export default function Timer({
                 const h = Math.max(120, barHeight + padY);
                 const rx = 48;
                 const strokeW = 14;
-                const elapsedFraction = Math.max(0, Math.min(1, (totalTime - timeRemaining) / totalTime));
-                
+                // Add 1-second compensation so animation stays ahead and completes exactly at endpoint
+                const elapsedFraction = Math.max(0, Math.min(1, (totalTime - timeRemaining + 1) / totalTime));
+
                 // Stroke color: black (not started) → green → yellow → red as time passes
                 let strokeColor = '#1f2937'; // black initially
                 if (isActive) {
-                  if (percentageRemaining > 50) strokeColor = '#10b981'; // green
+                  if (timeRemaining <= 10) strokeColor = '#ef4444'; // red at 10 seconds
+                  else if (percentageRemaining > 50) strokeColor = '#10b981'; // green
                   else if (percentageRemaining > 25) strokeColor = '#eab308'; // yellow
                   else strokeColor = '#ef4444'; // red
                 }
                 
-                // Create rounded rect path
+                // Create rounded rect path starting from top-center
                 const x = strokeW / 2;
                 const y = strokeW / 2;
                 const width = w - strokeW;
                 const height = h - strokeW;
-                const pathData = `M ${x + rx} ${y} L ${x + width - rx} ${y} Q ${x + width} ${y} ${x + width} ${y + rx} L ${x + width} ${y + height - rx} Q ${x + width} ${y + height} ${x + width - rx} ${y + height} L ${x + rx} ${y + height} Q ${x} ${y + height} ${x} ${y + height - rx} L ${x} ${y + rx} Q ${x} ${y} ${x + rx} ${y}`;
-                
+                const centerX = x + width / 2;
+                const topY = y;
+
+                // Start from top center, go clockwise
+                const pathData = `M ${centerX} ${topY} L ${x + width - rx} ${y} Q ${x + width} ${y} ${x + width} ${y + rx} L ${x + width} ${y + height - rx} Q ${x + width} ${y + height} ${x + width - rx} ${y + height} L ${x + rx} ${y + height} Q ${x} ${y + height} ${x} ${y + height - rx} L ${x} ${y + rx} Q ${x} ${y} ${x + rx} ${y} L ${centerX} ${topY}`;
+
                 // Calculate path length for proper dash animation
                 const perimeter = 2 * ((width - 2*rx) + (height - 2*rx)) + Math.PI * 2 * rx;
-                const dashLength = Math.max(0, perimeter * elapsedFraction);
+                // Add slight extra length at completion to ensure it reaches the exact endpoint
+                const dashLength = elapsedFraction >= 1 ? perimeter + 5 : Math.max(0, perimeter * elapsedFraction);
 
                 return (
                   <div style={{ position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)', zIndex: 10 }}>
@@ -134,16 +141,16 @@ export default function Timer({
                         fill="transparent"
                         stroke={strokeColor}
                         strokeWidth={strokeW}
-                        strokeLinecap="round"
+                        strokeLinecap="butt"
                         strokeDasharray={perimeter}
                         strokeDashoffset={perimeter - dashLength}
-                        style={{ transformOrigin: `${w / 2}px ${h / 2}px`, transform: `rotate(-90deg)`, transition: 'stroke-dashoffset 0.5s linear, stroke 0.3s ease' }}
+                        style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s ease' }}
                       />
                     </svg>
 
-                    {/* Position title outside rectangle, just below it */}
+                    {/* Position title centered between rectangle and buttons */}
                     {positionTitle && (
-                      <div style={{ position: 'absolute', left: '50%', top: `${Math.round(h + 24)}px`, transform: 'translateX(-50%)', width: w, textAlign: 'center', zIndex: 25 }}>
+                      <div style={{ position: 'absolute', left: '50%', top: `${Math.round(h + 18)}px`, transform: 'translateX(-50%)', width: w, textAlign: 'center', zIndex: 25 }}>
                         <div style={{ color: '#c0392b', fontWeight: 800, fontSize: '48px' }}>{positionTitle}</div>
                       </div>
                     )}
