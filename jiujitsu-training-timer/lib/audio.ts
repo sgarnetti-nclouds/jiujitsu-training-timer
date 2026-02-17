@@ -151,121 +151,112 @@ function ensureVoicesLoaded(): Promise<SpeechSynthesisVoice[]> {
 
 /**
  * Use Web Speech API to announce text
+ * Returns a Promise that resolves when speech finishes (or times out)
  */
-export function speak(text: string, opts?: { pitch?: number; rate?: number; volume?: number; voiceName?: string; male?: boolean }, onEnd?: () => void): void {
+export function speak(text: string, opts?: { pitch?: number; rate?: number; volume?: number; voiceName?: string; male?: boolean }): Promise<void> {
   console.log('speak called with text:', text);
-  if (typeof window === 'undefined') {
-    console.log('Window is undefined, cannot speak');
-    if (onEnd) {
-      console.log('Calling onEnd because window is undefined');
-      onEnd();
-    }
-    return;
-  }
 
-  // Set up safety timeout - if speech doesn't complete in 2 seconds, call callback anyway
-  let callbackFired = false;
-  const safeOnEnd = () => {
-    if (!callbackFired && onEnd) {
-      callbackFired = true;
-      console.log('Callback being called from safeOnEnd');
-      try {
-        onEnd();
-      } catch (err) {
-        console.error('Error in onEnd callback:', err);
-      }
-    }
-  };
-
-  if (onEnd) {
-    setTimeout(() => {
-      if (!callbackFired) {
-        console.log('Speech timeout - forcing callback after 2 seconds');
-        safeOnEnd();
-      }
-    }, 2000);
-  }
-
-  // Check if speech synthesis is available
-  if (!window.speechSynthesis) {
+  if (typeof window === 'undefined' || !window.speechSynthesis) {
     console.log('Speech synthesis not available');
-    safeOnEnd();
-    return;
+    return Promise.resolve();
   }
 
-  // Resume speech synthesis if needed
-  if (window.speechSynthesis.paused) {
-    window.speechSynthesis.resume();
-  }
-
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel();
-
-  // Wait for voices to be loaded, then speak
-  ensureVoicesLoaded().then((voices) => {
-    try {
-      console.log('Voices loaded:', voices.length);
-
-      if (!voices || voices.length === 0) {
-        console.log('No voices available after waiting, skipping speech');
-        safeOnEnd();
-        return;
+  return new Promise<void>((resolve) => {
+    let resolved = false;
+    const done = () => {
+      if (!resolved) {
+        resolved = true;
+        resolve();
       }
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      console.log('Created speech utterance');
-      // Slightly slower and louder defaults
-      utterance.rate = opts?.rate ?? 0.85;
-      utterance.pitch = opts?.pitch ?? 0.9;
-      utterance.volume = opts?.volume ?? 1.0;
-
-    if (voices && voices.length) {
-      let chosen: SpeechSynthesisVoice | undefined;
-      if (opts?.voiceName) {
-        chosen = voices.find((v) => v.name.toLowerCase().includes(opts.voiceName!.toLowerCase()));
-      }
-      if (!chosen && opts?.male) {
-        // Stronger heuristic: prefer voices with common male names first
-        chosen = voices.find((v) => /alex|daniel|tom|matthew|david|john|mark|ryan|paul|chris|michael/i.test(v.name));
-      }
-      // If still not found, avoid obviously female-named voices (common female names)
-      if (!chosen) {
-        const femalePattern = /samantha|victoria|katherine|kathy|kate|yaroslava|zira|zira/i;
-        chosen = voices.find((v) => !femalePattern.test(v.name));
-      }
-      if (!chosen) {
-        // Fallback: prefer locale-matching en-US or the first available
-        chosen = voices.find((v) => v.lang && v.lang.toLowerCase().startsWith('en')) || voices[0];
-      }
-
-      if (chosen) {
-        console.log('Selected voice:', chosen.name);
-        utterance.voice = chosen;
-        utterance.lang = chosen.lang || 'en-US';
-      } else {
-        utterance.lang = 'en-US';
-      }
-    }
-
-    utterance.onend = () => {
-      console.log('Speech onend event fired');
-      safeOnEnd();
-    };
-    utterance.onerror = (event) => {
-      console.error('Speech error event:', event);
-      safeOnEnd();
     };
 
-      console.log('About to call speechSynthesis.speak');
-      window.speechSynthesis.speak(utterance);
-      console.log('speechSynthesis.speak called');
-    } catch (error) {
-      console.error('Error speaking:', error);
-      safeOnEnd();
+    // Safety timeout - if speech doesn't complete in 5 seconds, resolve anyway
+    setTimeout(() => {
+      if (!resolved) {
+        console.log('Speech timeout - forcing resolve after 5 seconds');
+        done();
+      }
+    }, 5000);
+
+    // Resume speech synthesis if needed
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
     }
-  }).catch((error) => {
-    console.error('Error loading voices:', error);
-    safeOnEnd();
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    // Wait for voices to be loaded, then speak
+    ensureVoicesLoaded().then((voices) => {
+      try {
+        console.log('Voices loaded:', voices.length);
+
+        if (!voices || voices.length === 0) {
+          console.log('No voices available after waiting, skipping speech');
+          done();
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = opts?.rate ?? 0.85;
+        utterance.pitch = opts?.pitch ?? 0.9;
+        utterance.volume = opts?.volume ?? 1.0;
+
+        if (voices && voices.length) {
+          let chosen: SpeechSynthesisVoice | undefined;
+          if (opts?.voiceName) {
+            chosen = voices.find((v) => v.name.toLowerCase().includes(opts.voiceName!.toLowerCase()));
+          }
+          // Log all available voices for debugging
+          console.log('ALL AVAILABLE VOICES:');
+          voices.forEach((v, i) => console.log(`  ${i}: "${v.name}" (${v.lang}) local=${v.localService}`));
+
+          if (!chosen && opts?.male) {
+            const enUS = voices.filter((v) => v.lang === 'en-US' || v.lang === 'en_US');
+
+            // 1st: Google voices (most natural sounding in Chrome)
+            chosen = enUS.find((v) => /google us english/i.test(v.name));
+            // 2nd: Premium/Enhanced voices (best quality on macOS Safari)
+            if (!chosen) chosen = voices.find((v) => /enhanced|premium/i.test(v.name) && /en/i.test(v.lang));
+            // 3rd: Known good macOS voices
+            if (!chosen) chosen = enUS.find((v) => /\b(evan|alex|aaron)\b/i.test(v.name));
+            // 4th: Any en-US voice
+            if (!chosen) chosen = enUS[0];
+          }
+          if (!chosen) {
+            const enUS = voices.filter((v) => v.lang === 'en-US' || v.lang === 'en_US');
+            chosen = enUS[0] || voices.find((v) => v.lang && v.lang.toLowerCase().startsWith('en')) || voices[0];
+          }
+
+          if (chosen) {
+            console.log('Selected voice:', chosen.name);
+            utterance.voice = chosen;
+            utterance.lang = chosen.lang || 'en-US';
+          } else {
+            utterance.lang = 'en-US';
+          }
+        }
+
+        utterance.onend = () => {
+          console.log('Speech onend event fired');
+          done();
+        };
+        utterance.onerror = (event) => {
+          console.error('Speech error event:', event);
+          done();
+        };
+
+        console.log('About to call speechSynthesis.speak');
+        window.speechSynthesis.speak(utterance);
+        console.log('speechSynthesis.speak called');
+      } catch (error) {
+        console.error('Error speaking:', error);
+        done();
+      }
+    }).catch((error) => {
+      console.error('Error loading voices:', error);
+      done();
+    });
   });
 }
 
@@ -274,16 +265,23 @@ export function speak(text: string, opts?: { pitch?: number; rate?: number; volu
 /**
  * Announce position with speech ONLY (no bell)
  * Bell is played separately at the end of the 10-second countdown
+ * Returns a Promise that resolves when the announcement finishes
  */
-export function announcRound(roundNumber: number, positionName: string): void {
+export function announcRound(roundNumber: number, positionName: string): Promise<void> {
   console.log('=== ANNOUNCING POSITION ===');
   console.log('Round:', roundNumber, 'Position:', positionName);
 
-  const text = `Round ${roundNumber}. ${positionName}`;
+  // Phonetic adjustments for TTS pronunciation
+  const spokenName = positionName
+    .replace(/\bDe\b/g, 'Day')
+    .replace(/Riva/gi, 'Heeva')
+    .replace(/Lasso/gi, 'Lahhsso');
+
+  const text = `Round ${roundNumber}. ${spokenName}`;
   console.log('TEXT TO SPEAK:', text);
 
-  // Use the robust speak() function with male voice preference
-  speak(text, { male: true, rate: 0.85, pitch: 0.9, volume: 1.0 });
+  // Bold announcer voice
+  return speak(text, { voiceName: 'Google UK English Male', rate: 1.15, pitch: 1.0, volume: 1.0 });
 }
 
 /**
@@ -367,12 +365,12 @@ export function playWhistle(): void {
  */
 export function announceRoundEnd(): void {
   console.log('announceRoundEnd called - playing 3 quick bells');
-  // Play three bells in very quick succession
+  // Play three bells in rapid succession
   playAirHorn();
   setTimeout(() => {
     playAirHorn();
-  }, 250);  // Super fast - 0.25 seconds between bells
+  }, 150);
   setTimeout(() => {
     playAirHorn();
-  }, 500); // Total duration: 0.5 seconds for all three bells
+  }, 300);
 }

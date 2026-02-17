@@ -41,9 +41,6 @@ export default function PositionSelector({
               }}
             >
               <div className="font-semibold text-white">{position.name}</div>
-              <div className="text-xs text-gray-300 capitalize">
-                {position.category}
-              </div>
             </button>
           ))}
         </div>

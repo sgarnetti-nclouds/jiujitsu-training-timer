@@ -49,7 +49,6 @@ export default function PositionPicker({
           }}
         >
           <p className="text-white font-semibold">{selectedPosition.name}</p>
-          <p className="text-gray-300 text-sm capitalize">Category: {selectedPosition.category}</p>
         </div>
       )}
 

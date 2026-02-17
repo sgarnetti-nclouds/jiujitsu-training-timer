@@ -111,36 +111,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [isActive, isPaused, isGetReady, trainingPlan, isResting, currentQuickRound, numQuickRounds]);
 
-  // Announcement effect for training plan
-  useEffect(() => {
-    if (
-      isActive &&
-      !isPaused &&
-      !isGetReady &&
-      !announcementMade &&
-      timeRemaining < currentDuration - 1 &&
-      trainingPlan &&
-      !isResting
-    ) {
-      const position = currentRoundConfig?.position;
-      const roundNum = currentRoundIndex + 1;
-      const positionName = position?.name || 'Neutral';
-      announcRound(roundNum, positionName);
-      setAnnouncementMade(true);
-    }
-  }, [
-    isActive,
-    isPaused,
-    isGetReady,
-    announcementMade,
-    timeRemaining,
-    currentDuration,
-    trainingPlan,
-    isResting,
-    currentRoundIndex,
-    currentRoundConfig?.position,
-  ]);
-
   // Handle rest period completion
   useEffect(() => {
     if (isResting && !isActive && timeRemaining === 0) {
@@ -150,11 +120,18 @@ export default function Home() {
         setIsResting(false);
         setAnnouncementMade(false);
         setTimeRemaining(trainingPlan!.rounds[nextRoundIndex].duration);
-        // Auto-start next round with get ready countdown
-        setTimeout(() => {
+        // Auto-start next round: announce position, then start countdown
+        const nextPosition = trainingPlan!.rounds[nextRoundIndex].position;
+        const startCountdown = () => {
           setIsGetReady(true);
           setGetReadyTime(10);
           setIsPaused(false);
+        };
+        setTimeout(async () => {
+          if (nextPosition) {
+            await announcRound(nextRoundIndex + 1, nextPosition.name);
+          }
+          startCountdown();
         }, 1000);
       } else {
         // Training session complete
@@ -172,41 +149,29 @@ export default function Home() {
     }
   };
 
-  const handleStartQuick = () => {
-    // STEP 1: Initialize speech synthesis FIRST (before any other audio)
+  const handleStartQuick = async () => {
+    // Reset timer to full duration
+    setTimeRemaining(duration);
+
+    // STEP 1: Initialize speech synthesis
     try {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
-        // Resume speech synthesis if suspended
         window.speechSynthesis.resume();
-        // Clear any pending speech
         window.speechSynthesis.cancel();
-        // Load voices if not already loaded
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length === 0) {
-          // Voices not loaded yet, trigger loading
-          window.speechSynthesis.getVoices();
-        }
+        window.speechSynthesis.getVoices();
       }
     } catch (error) {
       console.error('Error initializing speech:', error);
     }
 
-    // STEP 2: Announce position type immediately if selected (BEFORE beep)
+    // STEP 2: Announce position and WAIT for it to finish
     if (selectedPosition) {
       console.log('START: Announcing position:', selectedPosition.name);
-      announcRound(currentQuickRound, selectedPosition.name);
-    } else {
-      console.log('START: No position selected');
+      await announcRound(currentQuickRound, selectedPosition.name);
+      console.log('START: Announcement finished, starting countdown');
     }
 
-    // STEP 3: Initialize audio context with beep (AFTER speech)
-    try {
-      playBeep();
-    } catch (error) {
-      console.error('Error initializing audio:', error);
-    }
-
-    // STEP 4: Start the 10-second countdown
+    // STEP 4: Start the 10-second countdown AFTER announcement completes
     setIsGetReady(true);
     setGetReadyTime(10);
     setIsPaused(false);
@@ -350,6 +315,9 @@ export default function Home() {
               onClick={() => {
                 const randomPos = positions[Math.floor(Math.random() * positions.length)];
                 setSelectedPosition(randomPos);
+                if (!isActive && !isGetReady) {
+                  setTimeRemaining(duration);
+                }
               }}
               className="px-6 py-2 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg"
             >
@@ -430,8 +398,8 @@ export default function Home() {
           {/* Controls */}
           <div className="flex gap-4 mt-24 justify-center">
             <Button
-              onClick={() => {
-                // Initialize speech synthesis FIRST
+              onClick={async () => {
+                // Initialize speech synthesis
                 try {
                   if (typeof window !== 'undefined' && window.speechSynthesis) {
                     window.speechSynthesis.resume();
@@ -442,18 +410,12 @@ export default function Home() {
                   console.error('Error initializing speech:', error);
                 }
 
-                // Announce position if in training plan
+                // Announce position and WAIT for it to finish
                 if (currentRoundConfig?.position) {
-                  announcRound(currentRoundIndex + 1, currentRoundConfig.position.name);
+                  await announcRound(currentRoundIndex + 1, currentRoundConfig.position.name);
                 }
 
-                // Initialize audio context
-                try {
-                  playBeep();
-                } catch (error) {
-                  console.error('Error initializing audio:', error);
-                }
-
+                // Start countdown AFTER announcement completes
                 setIsGetReady(true);
                 setGetReadyTime(10);
                 setIsPaused(false);
@@ -505,6 +467,9 @@ export default function Home() {
           onSelect={(position) => {
             setSelectedPosition(position);
             setShowPositionSelector(false);
+            if (!isActive && !isGetReady) {
+              setTimeRemaining(duration);
+            }
           }}
           onClose={() => setShowPositionSelector(false)}
         />
