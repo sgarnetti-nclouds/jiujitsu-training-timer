@@ -10,7 +10,6 @@ import { announcRound, announceRoundEnd, playBeep, playAirHorn } from '@/lib/aud
 import { positions } from '@/lib/positions';
 
 const PRESET_DURATIONS = [
-  { label: '10 sec', seconds: 10 },
   { label: '1 min', seconds: 60 },
   { label: '3 min', seconds: 180 },
   { label: '5 min', seconds: 300 },
