@@ -84,7 +84,7 @@ export default function Timer({
       {/* Time Display */}
       <div className="flex flex-col items-center justify-center">
           <div ref={containerRef} className="relative inline-block" style={{ paddingBottom: '48px' }}>
-            <div ref={timeRef} className="font-bold tabular-nums" style={{ fontSize: '400px', lineHeight: '1', letterSpacing: '-0.05em', color: darkMode ? '#000' : '#000', position: 'relative', zIndex: 30 }}>
+            <div ref={timeRef} className="font-bold tabular-nums" style={{ fontSize: '400px', lineHeight: '1', letterSpacing: '-0.05em', color: darkMode ? '#fff' : '#000', position: 'relative', zIndex: 30 }}>
               {formatTime(timeRemaining)}
             </div>
 
