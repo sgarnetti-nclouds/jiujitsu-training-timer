@@ -19,6 +19,9 @@ const PRESET_DURATIONS = [
 type ViewMode = 'quick' | 'plan';
 
 export default function Home() {
+  // Dark mode
+  const [darkMode, setDarkMode] = useState(false);
+
   // View and mode
   const [viewMode, setViewMode] = useState<ViewMode>('quick');
   const [showTrainingPlanSelector, setShowTrainingPlanSelector] = useState(false);
@@ -48,36 +51,43 @@ export default function Home() {
   const currentDuration = isResting ? (trainingPlan?.restDuration || 60) : (currentRoundConfig?.duration || duration);
   const displayPosition = isResting ? null : (currentRoundConfig?.position || selectedPosition);
 
-  // Get Ready countdown effect
+  // Get Ready countdown effect — only decrements the counter
   useEffect(() => {
     if (!isGetReady || isPaused) return;
 
     const interval = setInterval(() => {
       setGetReadyTime((prev) => {
-        // Play beep for each countdown number
-        if (prev > 1) {
-          playBeep();
-        }
-
         if (prev <= 1) {
           clearInterval(interval);
-          setIsGetReady(false);
-          setIsActive(true);
-          setGetReadyTime(10); // Reset for next time
-
-          // STEP 4: Play bell to signal round start (position already announced when Start was clicked)
-          console.log('COUNTDOWN COMPLETE: Playing bell to start round');
-          playAirHorn();
-          setAnnouncementMade(true);
-
-          return 10;
+          return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isGetReady, isPaused, trainingPlan, currentRoundConfig, currentRoundIndex, selectedPosition, currentQuickRound]);
+  }, [isGetReady, isPaused]);
+
+  // Play beep sound on each countdown tick
+  useEffect(() => {
+    if (isGetReady && getReadyTime > 0 && getReadyTime < 10) {
+      playBeep();
+    }
+  }, [isGetReady, getReadyTime]);
+
+  // Handle countdown reaching zero — transition to active timer
+  useEffect(() => {
+    if (!isGetReady || getReadyTime > 0) return;
+
+    setIsGetReady(false);
+    setIsActive(true);
+    setGetReadyTime(10); // Reset for next time
+
+    // Play bell to signal round start (position already announced when Start was clicked)
+    console.log('COUNTDOWN COMPLETE: Playing bell to start round');
+    playAirHorn();
+    setAnnouncementMade(true);
+  }, [isGetReady, getReadyTime]);
 
   // Timer countdown effect
   useEffect(() => {
@@ -228,15 +238,39 @@ export default function Home() {
     }
   };
 
+  // Dark mode button styles
+  const btnClass = darkMode
+    ? 'px-6 py-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg border border-white'
+    : 'px-6 py-2 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg';
+
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4">
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 ${darkMode ? 'bg-black' : 'bg-white'}`}>
+      {/* Dark Mode Toggle - top right */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+        <span className={`text-base font-bold ${darkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+          {darkMode ? 'Dark' : 'Light'}
+        </span>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className={`relative w-16 h-8 rounded-full transition-colors border-2 ${
+            darkMode ? 'bg-gray-700 border-white' : 'bg-gray-300 border-gray-500'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-1 w-6 h-6 rounded-full transition-transform ${
+              darkMode ? 'translate-x-7 bg-white' : 'translate-x-0 bg-black'
+            }`}
+          />
+        </button>
+      </div>
+
       {/* Quick Timer View */}
       {viewMode === 'quick' && !trainingPlan && (
         <>
           {/* Quick Round Setup - All in one row */}
           <div className="mb-8 flex items-center justify-center gap-6 flex-wrap">
             {/* Title on the left */}
-            <h2 className="text-2xl font-bold text-black">Quick Round Setup</h2>
+            <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Quick Round Setup</h2>
 
             {/* Duration buttons in the middle */}
             <div className="flex gap-3">
@@ -247,8 +281,12 @@ export default function Home() {
                   disabled={isActive}
                   className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                     duration === preset.seconds
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : 'bg-gray-800 hover:bg-gray-700 text-white'
+                      ? darkMode
+                        ? 'bg-green-600 hover:bg-green-700 text-white border border-white'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                      : darkMode
+                        ? 'bg-gray-900 hover:bg-gray-800 text-white border border-white'
+                        : 'bg-gray-800 hover:bg-gray-700 text-white'
                   }`}
                 >
                   {preset.label}
@@ -258,7 +296,7 @@ export default function Home() {
 
             {/* Rounds selector on the right */}
             <div className="flex items-center gap-3">
-              <label className="text-black font-semibold">Rounds:</label>
+              <label className={`font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Rounds:</label>
               <select
                 value={numQuickRounds}
                 onChange={(e) => {
@@ -267,7 +305,9 @@ export default function Home() {
                   setCurrentQuickRound(1); // Reset to round 1
                 }}
                 disabled={isActive}
-                className="px-4 py-2 rounded-lg font-semibold bg-gray-800 text-white border-2 border-gray-700 focus:border-gray-600 focus:outline-none disabled:opacity-50"
+                className={`px-4 py-2 rounded-lg font-semibold bg-gray-800 text-white focus:outline-none disabled:opacity-50 ${
+                  darkMode ? 'border border-white' : 'border-2 border-gray-700 focus:border-gray-600'
+                }`}
               >
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                   <option key={num} value={num}>
@@ -276,7 +316,7 @@ export default function Home() {
                 ))}
               </select>
               {numQuickRounds > 1 && (
-                <span className="text-black font-semibold text-sm">
+                <span className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-black'}`}>
                   (Round {currentQuickRound}/{numQuickRounds})
                 </span>
               )}
@@ -288,7 +328,7 @@ export default function Home() {
             {isGetReady ? (
               <div className="flex flex-col items-center justify-center p-4">
                 <div className="text-yellow-400 text-6xl font-bold mb-4">GET READY</div>
-                <div className="text-black text-9xl font-bold">{getReadyTime}</div>
+                <div className={`text-9xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>{getReadyTime}</div>
               </div>
             ) : (
               <Timer
@@ -297,6 +337,7 @@ export default function Home() {
                 isPaused={isPaused}
                 totalTime={duration}
                 positionTitle={selectedPosition?.name ?? null}
+                darkMode={darkMode}
               />
             )}
           </div>
@@ -305,7 +346,7 @@ export default function Home() {
           <div className="flex gap-4 mt-16 justify-center flex-wrap">
             <Button
               onClick={() => setShowPositionSelector(true)}
-              className="px-6 py-2 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg"
+              className={btnClass}
             >
               {selectedPosition ? `Position: ${selectedPosition.name}` : 'Select Position'}
             </Button>
@@ -318,7 +359,7 @@ export default function Home() {
                   setTimeRemaining(duration);
                 }
               }}
-              className="px-6 py-2 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg"
+              className={btnClass}
             >
               🎲 Random Position
             </Button>
@@ -326,7 +367,7 @@ export default function Home() {
             <Button
               onClick={handleStartQuick}
               disabled={isActive || isGetReady}
-              className="px-6 py-2 bg-[#0f6b3a] hover:bg-[#0e5c33] text-white font-semibold rounded-lg disabled:opacity-50"
+              className={`px-6 py-2 bg-[#0f6b3a] hover:bg-[#0e5c33] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
               Start
             </Button>
@@ -334,21 +375,21 @@ export default function Home() {
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className="px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white font-semibold rounded-lg disabled:opacity-50"
+              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
               {isPaused ? 'Resume' : 'Pause'}
             </Button>
 
             <Button
               onClick={handleReset}
-              className="px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white font-semibold rounded-lg"
+              className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white font-semibold rounded-lg ${darkMode ? 'border border-white' : ''}`}
             >
               Reset
             </Button>
 
             <Button
               onClick={() => setShowTrainingPlanSelector(true)}
-              className="px-6 py-2 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg"
+              className={btnClass}
             >
               📋 Training Plan
             </Button>
@@ -363,7 +404,7 @@ export default function Home() {
         <>
           {/* Plan Info */}
           <div className="mb-6 text-center">
-            <h2 className="text-2xl font-bold text-white mb-2">{trainingPlan.name}</h2>
+            <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-white'}`}>{trainingPlan.name}</h2>
             <p className="text-gray-300">
               Round {currentRoundIndex + 1} of {trainingPlan.rounds.length}
               {isResting && ' • REST'}
@@ -375,7 +416,7 @@ export default function Home() {
             {isGetReady ? (
               <div className="flex flex-col items-center justify-center p-4">
                 <div className="text-yellow-400 text-6xl font-bold mb-4">GET READY</div>
-                <div className="text-black text-9xl font-bold">{getReadyTime}</div>
+                <div className={`text-9xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>{getReadyTime}</div>
               </div>
             ) : (
               <Timer
@@ -384,6 +425,7 @@ export default function Home() {
                 isPaused={isPaused}
                 totalTime={currentDuration}
                 positionTitle={displayPosition?.name ?? null}
+                darkMode={darkMode}
               />
             )}
           </div>
@@ -421,7 +463,7 @@ export default function Home() {
                 setAnnouncementMade(false);
               }}
               disabled={isActive || isGetReady}
-              className="px-6 py-2 bg-[#0f6b3a] hover:bg-[#0e5c33] text-white font-semibold rounded-lg disabled:opacity-50"
+              className={`px-6 py-2 bg-[#0f6b3a] hover:bg-[#0e5c33] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
               Start
             </Button>
@@ -429,22 +471,22 @@ export default function Home() {
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className="px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white font-semibold rounded-lg disabled:opacity-50"
+              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
               {isPaused ? 'Resume' : 'Pause'}
             </Button>
 
             {isResting && (
-              <Button onClick={handleSkipRest} className="px-6 py-2 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg">
+              <Button onClick={handleSkipRest} className={btnClass}>
                 Skip Rest
               </Button>
             )}
 
-            <Button onClick={handleReset} className="px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white font-semibold rounded-lg">
+            <Button onClick={handleReset} className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white font-semibold rounded-lg ${darkMode ? 'border border-white' : ''}`}>
               Restart Round
             </Button>
 
-            <Button onClick={handleEndSession} className="px-6 py-2 bg-black hover:bg-gray-900 text-white font-semibold rounded-lg">
+            <Button onClick={handleEndSession} className={btnClass}>
               End Session
             </Button>
           </div>

@@ -8,6 +8,7 @@ interface TimerProps {
   isPaused: boolean;
   totalTime?: number;
   positionTitle?: string | null;
+  darkMode?: boolean;
 }
 
 export default function Timer({
@@ -16,6 +17,7 @@ export default function Timer({
   isPaused,
   totalTime = 180,
   positionTitle = null,
+  darkMode = false,
 }: TimerProps) {
 
   // Format time as MM:SS
@@ -82,7 +84,7 @@ export default function Timer({
       {/* Time Display */}
       <div className="flex flex-col items-center justify-center">
           <div ref={containerRef} className="relative inline-block" style={{ paddingBottom: '48px' }}>
-            <div ref={timeRef} className="font-bold tabular-nums" style={{ fontSize: '400px', lineHeight: '1', letterSpacing: '-0.05em', color: '#000', position: 'relative', zIndex: 30 }}>
+            <div ref={timeRef} className="font-bold tabular-nums" style={{ fontSize: '400px', lineHeight: '1', letterSpacing: '-0.05em', color: darkMode ? '#000' : '#000', position: 'relative', zIndex: 30 }}>
               {formatTime(timeRemaining)}
             </div>
 
@@ -130,7 +132,7 @@ export default function Timer({
                       <path
                         d={pathData}
                         fill="transparent"
-                        stroke="#364152"
+                        stroke={darkMode ? '#555' : '#364152'}
                         strokeWidth={strokeW}
                         opacity={0.9}
                       />
