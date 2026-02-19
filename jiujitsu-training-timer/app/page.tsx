@@ -367,7 +367,7 @@ export default function Home() {
             <Button
               onClick={handleStartQuick}
               disabled={isActive || isGetReady}
-              className={`px-6 py-2 bg-[#0f6b3a] hover:bg-[#0e5c33] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
+              className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
               Start
             </Button>
@@ -463,7 +463,7 @@ export default function Home() {
                 setAnnouncementMade(false);
               }}
               disabled={isActive || isGetReady}
-              className={`px-6 py-2 bg-[#0f6b3a] hover:bg-[#0e5c33] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
+              className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
               Start
             </Button>
