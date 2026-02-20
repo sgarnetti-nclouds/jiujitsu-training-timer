@@ -22,6 +22,15 @@ export default function Home() {
   // Dark mode
   const [darkMode, setDarkMode] = useState(false);
 
+  // Detect landscape mobile (phone rotated horizontally) for screencasting layout
+  const [isLandscapeMobile, setIsLandscapeMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsLandscapeMobile(window.innerWidth > window.innerHeight && window.innerHeight < 500);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   // Speech toggle
   const [speechEnabled, setSpeechEnabled] = useState(true);
 
@@ -272,8 +281,8 @@ export default function Home() {
       {/* Quick Timer View */}
       {viewMode === 'quick' && !trainingPlan && (
         <>
-          {/* Quick Round Setup — hidden in landscape (screencasting mode) */}
-          <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 w-full px-4 landscape:hidden">
+          {/* Quick Round Setup — hidden in landscape mobile (screencasting mode) */}
+          <div className={`mb-4 sm:mb-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 w-full px-4 ${isLandscapeMobile ? 'hidden' : ''}`}>
             {/* Title */}
             <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Quick Round Setup</h2>
 
@@ -348,7 +357,7 @@ export default function Home() {
           </div>
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 landscape:gap-2 mt-8 sm:mt-16 landscape:mt-2 justify-center px-4">
+          <div className={`flex flex-wrap justify-center px-4 ${isLandscapeMobile ? 'gap-2 mt-2' : 'gap-3 sm:gap-4 mt-8 sm:mt-16'}`}>
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
@@ -455,7 +464,7 @@ export default function Home() {
           )}
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 landscape:gap-2 mt-8 sm:mt-24 landscape:mt-2 justify-center px-4">
+          <div className={`flex flex-wrap justify-center px-4 ${isLandscapeMobile ? 'gap-2 mt-2' : 'gap-3 sm:gap-4 mt-8 sm:mt-24'}`}>
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
