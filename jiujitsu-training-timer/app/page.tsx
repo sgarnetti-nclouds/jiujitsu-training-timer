@@ -406,12 +406,13 @@ export default function Home() {
               <Button
                 onClick={handlePause}
                 disabled={!isActive}
-                className={`px-6 py-2 ${darkMode ? 'bg-[#fde047] hover:bg-[#facc15]' : 'bg-[#facc15] hover:bg-[#eab308]'} text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+                className={`px-6 py-2 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+                style={{ backgroundColor: darkMode ? '#fde047' : '#facc15' }}
               >
                 {isPaused ? '▶' : (
-                  <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" style={{display:'inline-block',verticalAlign:'middle'}}>
-                    <rect x="0" y="0" width="5" height="18" rx="1"/>
-                    <rect x="9" y="0" width="5" height="18" rx="1"/>
+                  <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor" style={{display:'inline-block',verticalAlign:'middle'}}>
+                    <rect x="0" y="4" width="6" height="20" rx="1.5"/>
+                    <rect x="10" y="4" width="6" height="20" rx="1.5"/>
                   </svg>
                 )}
               </Button>
@@ -526,9 +527,15 @@ export default function Home() {
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className={`px-6 py-2 ${darkMode ? 'bg-[#fde047] hover:bg-[#facc15]' : 'bg-[#facc15] hover:bg-[#eab308]'} text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+              className={`px-6 py-2 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+              style={{ backgroundColor: darkMode ? '#fde047' : '#facc15' }}
             >
-              {isPaused ? '▶' : <span style={{ letterSpacing: '-0.15em' }}>❚❚</span>}
+              {isPaused ? '▶' : (
+                <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor" style={{display:'inline-block',verticalAlign:'middle'}}>
+                  <rect x="0" y="4" width="6" height="20" rx="1.5"/>
+                  <rect x="10" y="4" width="6" height="20" rx="1.5"/>
+                </svg>
+              )}
             </Button>
 
             {isResting && (
