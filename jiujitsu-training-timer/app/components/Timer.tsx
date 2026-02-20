@@ -203,7 +203,7 @@ export default function Timer({
       </div>
 
       {/* spacer kept for layout consistency */}
-      <div className="mt-8" />
+      <div className="mt-8 landscape:mt-1" />
     </div>
   );
 }

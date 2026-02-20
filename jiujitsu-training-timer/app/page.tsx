@@ -348,7 +348,7 @@ export default function Home() {
           </div>
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-16 justify-center px-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-16 landscape:mt-2 justify-center px-4">
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
@@ -455,7 +455,7 @@ export default function Home() {
           )}
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-24 justify-center px-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-24 landscape:mt-2 justify-center px-4">
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
