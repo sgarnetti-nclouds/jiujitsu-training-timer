@@ -22,6 +22,9 @@ export default function Home() {
   // Dark mode
   const [darkMode, setDarkMode] = useState(false);
 
+  // Speech toggle
+  const [speechEnabled, setSpeechEnabled] = useState(true);
+
   // View and mode
   const [viewMode, setViewMode] = useState<ViewMode>('quick');
   const [showTrainingPlanSelector, setShowTrainingPlanSelector] = useState(false);
@@ -162,22 +165,24 @@ export default function Home() {
     // Reset timer to full duration
     setTimeRemaining(duration);
 
-    // STEP 1: Initialize speech synthesis
-    try {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.resume();
+    // iOS requires speechSynthesis.speak() to be called synchronously within a user gesture.
+    // Unlock it now before any awaits, otherwise iOS blocks speech entirely.
+    if (speechEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
+      try {
         window.speechSynthesis.cancel();
-        window.speechSynthesis.getVoices();
+        const unlock = new SpeechSynthesisUtterance(' ');
+        unlock.volume = 0;
+        unlock.rate = 10;
+        window.speechSynthesis.speak(unlock);
+        // Don't cancel — let speak() in audio.ts cancel it when real speech starts
+      } catch {
+        // ignore
       }
-    } catch (error) {
-      console.error('Error initializing speech:', error);
     }
 
-    // STEP 2: Announce position and WAIT for it to finish
-    if (selectedPosition) {
-      console.log('START: Announcing position:', selectedPosition.name);
+    // Announce position and WAIT for it to finish
+    if (speechEnabled && selectedPosition) {
       await announcRound(currentQuickRound, selectedPosition.name);
-      console.log('START: Announcement finished, starting countdown');
     }
 
     // STEP 4: Start the 10-second countdown AFTER announcement completes
@@ -348,6 +353,25 @@ export default function Home() {
               {selectedPosition ? `Position: ${selectedPosition.name}` : 'Select Position'}
             </Button>
 
+            {/* Speech toggle */}
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>🔊</span>
+              <button
+                onClick={() => setSpeechEnabled(!speechEnabled)}
+                className={`relative w-12 h-6 rounded-full transition-colors border-2 ${
+                  speechEnabled
+                    ? darkMode ? 'bg-green-600 border-white' : 'bg-green-600 border-green-700'
+                    : darkMode ? 'bg-gray-700 border-white' : 'bg-gray-400 border-gray-500'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    speechEnabled ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
             <Button
               onClick={() => {
                 const randomPos = positions[Math.floor(Math.random() * positions.length)];
@@ -430,21 +454,42 @@ export default function Home() {
 
           {/* Controls */}
           <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-24 justify-center px-4">
+            {/* Speech toggle */}
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>🔊</span>
+              <button
+                onClick={() => setSpeechEnabled(!speechEnabled)}
+                className={`relative w-12 h-6 rounded-full transition-colors border-2 ${
+                  speechEnabled
+                    ? darkMode ? 'bg-green-600 border-white' : 'bg-green-600 border-green-700'
+                    : darkMode ? 'bg-gray-700 border-white' : 'bg-gray-400 border-gray-500'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                    speechEnabled ? 'translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
             <Button
               onClick={async () => {
-                // Initialize speech synthesis
-                try {
-                  if (typeof window !== 'undefined' && window.speechSynthesis) {
-                    window.speechSynthesis.resume();
+                // iOS requires speechSynthesis.speak() synchronously within user gesture
+                if (speechEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
+                  try {
                     window.speechSynthesis.cancel();
-                    window.speechSynthesis.getVoices();
+                    const unlock = new SpeechSynthesisUtterance(' ');
+                    unlock.volume = 0;
+                    unlock.rate = 10;
+                    window.speechSynthesis.speak(unlock);
+                  } catch {
+                    // ignore
                   }
-                } catch (error) {
-                  console.error('Error initializing speech:', error);
                 }
 
                 // Announce position and WAIT for it to finish
-                if (currentRoundConfig?.position) {
+                if (speechEnabled && currentRoundConfig?.position) {
                   await announcRound(currentRoundIndex + 1, currentRoundConfig.position.name);
                 }
 
