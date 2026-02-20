@@ -347,13 +347,6 @@ export default function Home() {
 
           {/* Controls and Position Picker */}
           <div className="flex gap-4 mt-16 justify-center flex-wrap">
-            <Button
-              onClick={() => setShowPositionSelector(true)}
-              className={btnClass}
-            >
-              {selectedPosition ? `Position: ${selectedPosition.name}` : 'Select Position'}
-            </Button>
-
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
@@ -372,6 +365,13 @@ export default function Home() {
                 />
               </button>
             </div>
+
+            <Button
+              onClick={() => setShowPositionSelector(true)}
+              className={btnClass}
+            >
+              {selectedPosition ? `Position: ${selectedPosition.name}` : 'Select Position'}
+            </Button>
 
             <Button
               onClick={() => {
