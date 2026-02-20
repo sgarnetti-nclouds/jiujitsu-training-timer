@@ -212,15 +212,20 @@ export function speak(text: string, opts?: { pitch?: number; rate?: number; volu
           voices.forEach((v, i) => console.log(`  ${i}: "${v.name}" (${v.lang}) local=${v.localService}`));
 
           if (!chosen && opts?.male) {
+            const enVoices = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
             const enUS = voices.filter((v) => v.lang === 'en-US' || v.lang === 'en_US');
 
-            // 1st: Google voices (most natural sounding in Chrome)
-            chosen = enUS.find((v) => /google us english/i.test(v.name));
-            // 2nd: Premium/Enhanced voices (best quality on macOS Safari)
+            // 1st: Google UK English Male (Chrome desktop)
+            chosen = voices.find((v) => /google uk english male/i.test(v.name));
+            // 2nd: Google US English (Chrome fallback)
+            if (!chosen) chosen = enUS.find((v) => /google us english/i.test(v.name));
+            // 3rd: Daniel — Apple's UK English male voice (iOS/macOS Safari)
+            if (!chosen) chosen = enVoices.find((v) => /\bdaniel\b/i.test(v.name));
+            // 4th: Premium/Enhanced voices (macOS Safari)
             if (!chosen) chosen = voices.find((v) => /enhanced|premium/i.test(v.name) && /en/i.test(v.lang));
-            // 3rd: Known good macOS voices
-            if (!chosen) chosen = enUS.find((v) => /\b(evan|alex|aaron)\b/i.test(v.name));
-            // 4th: Any en-US voice
+            // 5th: Other known male voices
+            if (!chosen) chosen = enUS.find((v) => /\b(evan|alex|aaron|rishi)\b/i.test(v.name));
+            // 6th: Any en-US voice
             if (!chosen) chosen = enUS[0];
           }
           if (!chosen) {
@@ -281,7 +286,7 @@ export function announcRound(roundNumber: number, positionName: string): Promise
   console.log('TEXT TO SPEAK:', text);
 
   // Bold announcer voice
-  return speak(text, { voiceName: 'Google UK English Male', rate: 1.15, pitch: 1.0, volume: 1.0 });
+  return speak(text, { voiceName: 'Google UK English Male', male: true, rate: 0.95, pitch: 1.0, volume: 1.0 });
 }
 
 /**
