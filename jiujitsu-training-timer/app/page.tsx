@@ -397,7 +397,7 @@ export default function Home() {
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+              className={`px-6 py-2 bg-[#eab308] hover:bg-[#ca8a04] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
             >
               {isPaused ? '▶' : '❙❙'}
             </Button>
@@ -514,7 +514,7 @@ export default function Home() {
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+              className={`px-6 py-2 bg-[#eab308] hover:bg-[#ca8a04] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
             >
               {isPaused ? '▶' : '❙❙'}
             </Button>
