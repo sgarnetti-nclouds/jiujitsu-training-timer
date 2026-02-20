@@ -50,11 +50,16 @@ export default function Timer({
   const [barWidth, setBarWidth] = useState<number | null>(null);
   const [barHeight, setBarHeight] = useState<number | null>(null);
   const [windowWidth, setWindowWidth] = useState<number>(1200);
+  const [windowHeight, setWindowHeight] = useState<number>(900);
   const [flashStart, setFlashStart] = useState(false);
 
   useEffect(() => {
     setWindowWidth(window.innerWidth);
-    const handleResize = () => setWindowWidth(window.innerWidth);
+    setWindowHeight(window.innerHeight);
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -70,8 +75,14 @@ export default function Timer({
     }
   }, [isActive]);
 
-  const isMobile = windowWidth < 640;
-  const fontSize = isMobile ? Math.round(windowWidth * 0.28) : 400;
+  // Landscape mobile: width > height and height is phone-sized
+  const isLandscapeMobile = windowWidth > windowHeight && windowHeight < 500;
+  const isMobile = windowWidth < 640 || isLandscapeMobile;
+  const fontSize = isLandscapeMobile
+    ? Math.round(windowHeight * 0.42)
+    : isMobile
+      ? Math.round(windowWidth * 0.28)
+      : 400;
   const padX = isMobile ? 16 : 120;
   const padY = isMobile ? 12 : 64;
   const rx = isMobile ? 16 : 48;
