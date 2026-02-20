@@ -81,7 +81,7 @@ export default function Timer({
   const fontSize = isLandscapeMobile
     ? Math.round(windowHeight * 0.42)
     : isMobile
-      ? Math.round(windowWidth * 0.28)
+      ? Math.round(windowWidth * 0.30)
       : 400;
   const padX = isMobile ? 16 : 120;
   const padY = isMobile ? 12 : 64;
@@ -203,7 +203,7 @@ export default function Timer({
       </div>
 
       {/* spacer kept for layout consistency */}
-      <div className="mt-8 landscape:mt-1" />
+      <div style={{ marginTop: isLandscapeMobile ? 4 : isMobile ? 8 : 32 }} />
     </div>
   );
 }

@@ -357,7 +357,7 @@ export default function Home() {
           </div>
 
           {/* Controls */}
-          <div className={`flex flex-wrap justify-center px-4 ${isLandscapeMobile ? 'gap-2 mt-2' : 'gap-3 sm:gap-4 mt-8 sm:mt-16'}`}>
+          <div className={`flex flex-wrap justify-center px-4 ${isLandscapeMobile ? 'gap-2 mt-2' : 'gap-3 sm:gap-4 mt-4 sm:mt-16'}`}>
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
@@ -403,18 +403,18 @@ export default function Home() {
                 ▶
               </Button>
 
-              <Button
+              <button
                 onClick={handlePause}
                 disabled={!isActive}
-                className={`px-6 py-2 bg-none ${darkMode ? 'bg-yellow-300 border border-white' : 'bg-yellow-400 border border-black'} text-white text-xl rounded-lg disabled:opacity-50`}
+                className={`px-6 py-2 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'bg-yellow-300 border border-white' : 'bg-yellow-400 border border-black'}`}
               >
                 {isPaused ? '▶' : (
-                  <svg width="20" height="22" viewBox="0 0 20 22" fill="currentColor" className="size-auto">
-                    <rect x="0" y="0" width="8" height="22" rx="2"/>
-                    <rect x="12" y="0" width="8" height="22" rx="2"/>
+                  <svg width="11" height="15" viewBox="0 0 11 15" fill="currentColor">
+                    <rect x="0" y="0" width="4" height="15" rx="1"/>
+                    <rect x="7" y="0" width="4" height="15" rx="1"/>
                   </svg>
                 )}
-              </Button>
+              </button>
 
               <Button
                 onClick={handleReset}
@@ -471,7 +471,7 @@ export default function Home() {
           )}
 
           {/* Controls */}
-          <div className={`flex flex-wrap justify-center px-4 ${isLandscapeMobile ? 'gap-2 mt-2' : 'gap-3 sm:gap-4 mt-8 sm:mt-24'}`}>
+          <div className={`flex flex-wrap justify-center px-4 ${isLandscapeMobile ? 'gap-2 mt-2' : 'gap-3 sm:gap-4 mt-4 sm:mt-24'}`}>
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
@@ -523,18 +523,18 @@ export default function Home() {
               ▶
             </Button>
 
-            <Button
+            <button
               onClick={handlePause}
               disabled={!isActive}
-              className={`px-6 py-2 bg-none ${darkMode ? 'bg-yellow-300 border border-white' : 'bg-yellow-400 border border-black'} text-white text-xl rounded-lg disabled:opacity-50`}
+              className={`px-6 py-2 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'bg-yellow-300 border border-white' : 'bg-yellow-400 border border-black'}`}
             >
               {isPaused ? '▶' : (
-                <svg width="20" height="22" viewBox="0 0 20 22" fill="currentColor" className="size-auto">
-                  <rect x="0" y="0" width="8" height="22" rx="2"/>
-                  <rect x="12" y="0" width="8" height="22" rx="2"/>
+                <svg width="11" height="15" viewBox="0 0 11 15" fill="currentColor">
+                  <rect x="0" y="0" width="4" height="15" rx="1"/>
+                  <rect x="7" y="0" width="4" height="15" rx="1"/>
                 </svg>
               )}
-            </Button>
+            </button>
 
             {isResting && (
               <Button onClick={handleSkipRest} className={btnClass}>
