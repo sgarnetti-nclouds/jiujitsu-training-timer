@@ -406,7 +406,8 @@ export default function Home() {
               <button
                 onClick={handlePause}
                 disabled={!isActive}
-                className={`appearance-none px-6 py-2 bg-yellow-400 hover:bg-yellow-500 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+                style={{ backgroundColor: '#facc15', color: 'white' }}
+                className={`appearance-none px-6 py-2 text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
               >
                 {isPaused ? '▶' : (
                   <svg width="11" height="15" viewBox="0 0 11 15" fill="currentColor">
@@ -526,7 +527,8 @@ export default function Home() {
             <button
               onClick={handlePause}
               disabled={!isActive}
-              className={`appearance-none px-6 py-2 bg-yellow-400 hover:bg-yellow-500 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+              style={{ backgroundColor: '#facc15', color: 'white' }}
+              className={`appearance-none px-6 py-2 text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
             >
               {isPaused ? '▶' : (
                 <svg width="11" height="15" viewBox="0 0 11 15" fill="currentColor">
