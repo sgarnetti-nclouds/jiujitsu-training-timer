@@ -49,15 +49,26 @@ export default function Timer({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [barWidth, setBarWidth] = useState<number | null>(null);
   const [barHeight, setBarHeight] = useState<number | null>(null);
-  const [windowWidth, setWindowWidth] = useState<number>(
-    typeof window !== 'undefined' ? window.innerWidth : 1200
-  );
+  const [windowWidth, setWindowWidth] = useState<number>(1200);
+  const [flashStart, setFlashStart] = useState(false);
 
   useEffect(() => {
+    setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Flash bright green when round starts
+  useEffect(() => {
+    if (isActive) {
+      setFlashStart(true);
+      const t = setTimeout(() => setFlashStart(false), 700);
+      return () => clearTimeout(t);
+    } else {
+      setFlashStart(false);
+    }
+  }, [isActive]);
 
   const isMobile = windowWidth < 640;
   const fontSize = isMobile ? Math.round(windowWidth * 0.28) : 400;
@@ -112,13 +123,17 @@ export default function Timer({
                 // Add 1-second compensation so animation stays ahead and completes exactly at endpoint
                 const elapsedFraction = Math.max(0, Math.min(1, (totalTime - timeRemaining + 1) / totalTime));
 
-                // Stroke color: black (not started) → green → yellow → red as time passes
-                let strokeColor = '#1f2937'; // black initially
-                if (isActive) {
+                // Stroke color: flash bright green on start → green → yellow → red as time passes
+                let strokeColor: string;
+                if (flashStart) {
+                  strokeColor = '#00ff88'; // bright green flash takes priority
+                } else if (isActive) {
                   if (timeRemaining <= 10) strokeColor = '#ef4444'; // red at 10 seconds
                   else if (percentageRemaining > 50) strokeColor = '#10b981'; // green
                   else if (percentageRemaining > 25) strokeColor = '#eab308'; // yellow
                   else strokeColor = '#ef4444'; // red
+                } else {
+                  strokeColor = '#1f2937'; // dark when not started
                 }
                 
                 // Create rounded rect path starting from top-center
