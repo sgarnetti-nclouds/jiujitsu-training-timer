@@ -394,28 +394,30 @@ export default function Home() {
               </Button>
             </div>
 
-            <Button
-              onClick={handleStartQuick}
-              disabled={isActive || isGetReady}
-              className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
-            >
-              ▶
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleStartQuick}
+                disabled={isActive || isGetReady}
+                className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+              >
+                ▶
+              </Button>
 
-            <Button
-              onClick={handlePause}
-              disabled={!isActive}
-              className={`px-6 py-2 bg-[#facc15] hover:bg-[#eab308] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
-            >
-              {isPaused ? '▶' : <span style={{ letterSpacing: '-0.15em' }}>❚❚</span>}
-            </Button>
+              <Button
+                onClick={handlePause}
+                disabled={!isActive}
+                className={`px-6 py-2 bg-[#facc15] hover:bg-[#eab308] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
+              >
+                {isPaused ? '▶' : <span style={{ letterSpacing: '-0.15em' }}>❚❚</span>}
+              </Button>
 
-            <Button
-              onClick={handleReset}
-              className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white text-xl rounded-lg ${darkMode ? 'border border-white' : 'border border-black'}`}
-            >
-              ↺
-            </Button>
+              <Button
+                onClick={handleReset}
+                className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white text-xl rounded-lg ${darkMode ? 'border border-white' : 'border border-black'}`}
+              >
+                ↺
+              </Button>
+            </div>
 
             <Button onClick={() => setShowTrainingPlanSelector(true)} className={btnClass}>
               📋 Training Plan
