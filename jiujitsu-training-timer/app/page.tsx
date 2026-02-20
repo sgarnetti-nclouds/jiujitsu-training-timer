@@ -408,7 +408,12 @@ export default function Home() {
                 disabled={!isActive}
                 className={`px-6 py-2 bg-[#facc15] hover:bg-[#eab308] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
               >
-                {isPaused ? '▶' : <span style={{ letterSpacing: '-0.15em' }}>❚❚</span>}
+                {isPaused ? '▶' : (
+                  <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" style={{display:'inline-block',verticalAlign:'middle'}}>
+                    <rect x="0" y="0" width="5" height="18" rx="1"/>
+                    <rect x="9" y="0" width="5" height="18" rx="1"/>
+                  </svg>
+                )}
               </Button>
 
               <Button
