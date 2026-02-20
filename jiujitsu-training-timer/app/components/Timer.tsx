@@ -49,6 +49,33 @@ export default function Timer({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [barWidth, setBarWidth] = useState<number | null>(null);
   const [barHeight, setBarHeight] = useState<number | null>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(1200);
+  const [flashStart, setFlashStart] = useState(false);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Flash bright green when round starts
+  useEffect(() => {
+    if (isActive) {
+      setFlashStart(true);
+      const t = setTimeout(() => setFlashStart(false), 700);
+      return () => clearTimeout(t);
+    } else {
+      setFlashStart(false);
+    }
+  }, [isActive]);
+
+  const isMobile = windowWidth < 640;
+  const fontSize = isMobile ? Math.round(windowWidth * 0.28) : 400;
+  const padX = isMobile ? 16 : 120;
+  const padY = isMobile ? 12 : 64;
+  const rx = isMobile ? 16 : 48;
+  const strokeW = isMobile ? 6 : 14;
 
   useEffect(() => {
     const timeEl = timeRef.current;
@@ -83,30 +110,30 @@ export default function Timer({
     <div className="flex flex-col items-center justify-center w-full h-full p-4">
       {/* Time Display */}
       <div className="flex flex-col items-center justify-center">
-          <div ref={containerRef} className="relative inline-block" style={{ paddingBottom: '48px' }}>
-            <div ref={timeRef} className="font-bold tabular-nums" style={{ fontSize: '400px', lineHeight: '1', letterSpacing: '-0.05em', color: darkMode ? '#fff' : '#000', position: 'relative', zIndex: 30 }}>
+          <div ref={containerRef} className="relative inline-block" style={{ paddingBottom: isMobile ? '24px' : '48px' }}>
+            <div ref={timeRef} className="font-bold tabular-nums" style={{ fontSize: `${fontSize}px`, lineHeight: '1', letterSpacing: '-0.05em', color: darkMode ? '#fff' : '#000', position: 'relative', zIndex: 30 }}>
               {formatTime(timeRemaining)}
             </div>
 
             {/* Rounded rectangle SVG surrounding the digits - placed behind digits */}
             {barWidth && barHeight && (
               (() => {
-                const padX = 120;
-                const padY = 64;
                 const w = Math.max(200, barWidth + padX);
                 const h = Math.max(120, barHeight + padY);
-                const rx = 48;
-                const strokeW = 14;
                 // Add 1-second compensation so animation stays ahead and completes exactly at endpoint
                 const elapsedFraction = Math.max(0, Math.min(1, (totalTime - timeRemaining + 1) / totalTime));
 
-                // Stroke color: black (not started) → green → yellow → red as time passes
-                let strokeColor = '#1f2937'; // black initially
-                if (isActive) {
+                // Stroke color: flash bright green on start → green → yellow → red as time passes
+                let strokeColor: string;
+                if (flashStart) {
+                  strokeColor = '#00ff88'; // bright green flash takes priority
+                } else if (isActive) {
                   if (timeRemaining <= 10) strokeColor = '#ef4444'; // red at 10 seconds
                   else if (percentageRemaining > 50) strokeColor = '#10b981'; // green
                   else if (percentageRemaining > 25) strokeColor = '#eab308'; // yellow
                   else strokeColor = '#ef4444'; // red
+                } else {
+                  strokeColor = '#1f2937'; // dark when not started
                 }
                 
                 // Create rounded rect path starting from top-center
@@ -153,7 +180,7 @@ export default function Timer({
                     {/* Position title centered between rectangle and buttons */}
                     {positionTitle && (
                       <div style={{ position: 'absolute', left: '50%', top: `${Math.round(h + 18)}px`, transform: 'translateX(-50%)', width: w, textAlign: 'center', zIndex: 25 }}>
-                        <div style={{ color: '#c0392b', fontWeight: 800, fontSize: '48px' }}>{positionTitle}</div>
+                        <div style={{ color: '#c0392b', fontWeight: 800, fontSize: isMobile ? '24px' : '48px' }}>{positionTitle}</div>
                       </div>
                     )}
                   </div>
