@@ -355,7 +355,7 @@ export default function Home() {
 
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
-              <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>🔊</span>
+              <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
               <button
                 onClick={() => setSpeechEnabled(!speechEnabled)}
                 className={`relative w-12 h-6 rounded-full transition-colors border-2 ${
@@ -456,7 +456,7 @@ export default function Home() {
           <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-24 justify-center px-4">
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
-              <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>🔊</span>
+              <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
               <button
                 onClick={() => setSpeechEnabled(!speechEnabled)}
                 className={`relative w-12 h-6 rounded-full transition-colors border-2 ${
