@@ -188,8 +188,8 @@ export default function Timer({
                       />
                     </svg>
 
-                    {/* Position title centered between rectangle and buttons */}
-                    {positionTitle && (
+                    {/* Position title centered between rectangle and buttons — hidden in landscape mobile to avoid overlapping buttons */}
+                    {positionTitle && !isLandscapeMobile && (
                       <div style={{ position: 'absolute', left: '50%', top: `${Math.round(h + 18)}px`, transform: 'translateX(-50%)', width: w, textAlign: 'center', zIndex: 25 }}>
                         <div style={{ color: '#c0392b', fontWeight: 800, fontSize: isMobile ? '24px' : '48px' }}>{positionTitle}</div>
                       </div>
