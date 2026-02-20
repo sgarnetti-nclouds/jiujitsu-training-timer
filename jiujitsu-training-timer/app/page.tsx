@@ -272,8 +272,8 @@ export default function Home() {
       {/* Quick Timer View */}
       {viewMode === 'quick' && !trainingPlan && (
         <>
-          {/* Quick Round Setup */}
-          <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 w-full px-4">
+          {/* Quick Round Setup — hidden in landscape (screencasting mode) */}
+          <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 w-full px-4 landscape:hidden">
             {/* Title */}
             <h2 className={`text-xl sm:text-2xl font-bold ${darkMode ? 'text-white' : 'text-black'}`}>Quick Round Setup</h2>
 
@@ -348,7 +348,7 @@ export default function Home() {
           </div>
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-16 landscape:mt-2 justify-center px-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4 landscape:gap-2 mt-8 sm:mt-16 landscape:mt-2 justify-center px-4">
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
@@ -455,7 +455,7 @@ export default function Home() {
           )}
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3 sm:gap-4 mt-8 sm:mt-24 landscape:mt-2 justify-center px-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4 landscape:gap-2 mt-8 sm:mt-24 landscape:mt-2 justify-center px-4">
             {/* Speech toggle */}
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-black'}`}>Announce Position</span>
