@@ -389,24 +389,24 @@ export default function Home() {
             <Button
               onClick={handleStartQuick}
               disabled={isActive || isGetReady}
-              className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
+              className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
-              Start
+              ▶
             </Button>
 
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
+              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
-              {isPaused ? 'Resume' : 'Pause'}
+              {isPaused ? '▶' : '⏸'}
             </Button>
 
             <Button
               onClick={handleReset}
-              className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white font-semibold rounded-lg ${darkMode ? 'border border-white' : ''}`}
+              className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white text-xl rounded-lg ${darkMode ? 'border border-white' : ''}`}
             >
-              Reset
+              ↺
             </Button>
 
             <Button
@@ -506,17 +506,17 @@ export default function Home() {
                 setAnnouncementMade(false);
               }}
               disabled={isActive || isGetReady}
-              className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
+              className={`px-6 py-2 bg-green-600 hover:bg-green-700 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
-              Start
+              ▶
             </Button>
 
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white font-semibold rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
+              className={`px-6 py-2 bg-[#b58b00] hover:bg-[#9f7700] text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : ''}`}
             >
-              {isPaused ? 'Resume' : 'Pause'}
+              {isPaused ? '▶' : '⏸'}
             </Button>
 
             {isResting && (
@@ -525,8 +525,8 @@ export default function Home() {
               </Button>
             )}
 
-            <Button onClick={handleReset} className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white font-semibold rounded-lg ${darkMode ? 'border border-white' : ''}`}>
-              Restart Round
+            <Button onClick={handleReset} className={`px-6 py-2 bg-[#c0392b] hover:bg-[#99271f] text-white text-xl rounded-lg ${darkMode ? 'border border-white' : ''}`}>
+              ↺
             </Button>
 
             <Button onClick={handleEndSession} className={btnClass}>
