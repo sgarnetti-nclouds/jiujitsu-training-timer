@@ -368,20 +368,22 @@ export default function Home() {
               </button>
             </div>
 
-            <Button onClick={() => setShowPositionSelector(true)} className={btnClass}>
-              {selectedPosition ? `Position: ${selectedPosition.name}` : 'Select Position'}
-            </Button>
+            <div className="flex gap-2 sm:gap-3">
+              <Button onClick={() => setShowPositionSelector(true)} className={btnClass}>
+                {selectedPosition ? `Position: ${selectedPosition.name}` : 'Select Position'}
+              </Button>
 
-            <Button
-              onClick={() => {
-                const randomPos = positions[Math.floor(Math.random() * positions.length)];
-                setSelectedPosition(randomPos);
-                if (!isActive && !isGetReady) setTimeRemaining(duration);
-              }}
-              className={btnClass}
-            >
-              🎲 Random Position
-            </Button>
+              <Button
+                onClick={() => {
+                  const randomPos = positions[Math.floor(Math.random() * positions.length)];
+                  setSelectedPosition(randomPos);
+                  if (!isActive && !isGetReady) setTimeRemaining(duration);
+                }}
+                className={btnClass}
+              >
+                🎲 Random Position
+              </Button>
+            </div>
 
             <Button
               onClick={handleStartQuick}
