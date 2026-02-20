@@ -406,13 +406,12 @@ export default function Home() {
               <Button
                 onClick={handlePause}
                 disabled={!isActive}
-                className={`px-6 py-2 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
-                style={{ backgroundColor: darkMode ? '#fde047' : '#facc15' }}
+                className={`px-6 py-2 bg-none ${darkMode ? 'bg-yellow-300 border border-white' : 'bg-yellow-400 border border-black'} text-white text-xl rounded-lg disabled:opacity-50`}
               >
                 {isPaused ? '▶' : (
-                  <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor" style={{display:'inline-block',verticalAlign:'middle'}}>
-                    <rect x="0" y="4" width="6" height="20" rx="1.5"/>
-                    <rect x="10" y="4" width="6" height="20" rx="1.5"/>
+                  <svg width="20" height="22" viewBox="0 0 20 22" fill="currentColor" className="size-auto">
+                    <rect x="0" y="0" width="8" height="22" rx="2"/>
+                    <rect x="12" y="0" width="8" height="22" rx="2"/>
                   </svg>
                 )}
               </Button>
@@ -527,13 +526,12 @@ export default function Home() {
             <Button
               onClick={handlePause}
               disabled={!isActive}
-              className={`px-6 py-2 text-white text-xl rounded-lg disabled:opacity-50 ${darkMode ? 'border border-white' : 'border border-black'}`}
-              style={{ backgroundColor: darkMode ? '#fde047' : '#facc15' }}
+              className={`px-6 py-2 bg-none ${darkMode ? 'bg-yellow-300 border border-white' : 'bg-yellow-400 border border-black'} text-white text-xl rounded-lg disabled:opacity-50`}
             >
               {isPaused ? '▶' : (
-                <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor" style={{display:'inline-block',verticalAlign:'middle'}}>
-                  <rect x="0" y="4" width="6" height="20" rx="1.5"/>
-                  <rect x="10" y="4" width="6" height="20" rx="1.5"/>
+                <svg width="20" height="22" viewBox="0 0 20 22" fill="currentColor" className="size-auto">
+                  <rect x="0" y="0" width="8" height="22" rx="2"/>
+                  <rect x="12" y="0" width="8" height="22" rx="2"/>
                 </svg>
               )}
             </Button>
